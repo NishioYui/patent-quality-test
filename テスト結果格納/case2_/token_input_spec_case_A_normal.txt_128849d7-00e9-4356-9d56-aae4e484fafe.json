@@ -1,0 +1,11 @@
+{
+  "step": "spec",
+  "input_tokens": 6596,
+  "model": "gpt-5.2",
+  "temperature": 0.2,
+  "run_id": "128849d7-00e9-4356-9d56-aae4e484fafe",
+  "case_file": "cases\\case_A_normal.txt",
+  "claims_path": "runs\\claims_case_A_normal.txt_d67832d4-9fc8-422e-8b3f-16fa2441b30c.json",
+  "drawings_path": "",
+  "measured_at": "2026-03-02T08:04:26+0900"
+}

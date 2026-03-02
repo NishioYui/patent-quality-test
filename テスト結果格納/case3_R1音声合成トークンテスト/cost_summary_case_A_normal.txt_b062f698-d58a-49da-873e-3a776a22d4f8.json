@@ -1,0 +1,91 @@
+{
+  "run_id": "b062f698-d58a-49da-873e-3a776a22d4f8",
+  "run_dir": "runs",
+  "case_file": "cases\\case_A_normal.txt",
+  "model": "gpt-5.2",
+  "temperature": 0.2,
+  "fx": {
+    "usd_jpy": 156.5,
+    "source": "ENV:USDJPY (default=155)"
+  },
+  "steps": {
+    "drawings": {
+      "found": true,
+      "step": "drawings",
+      "model": "gpt-5.2",
+      "run_id": "b062f698-d58a-49da-873e-3a776a22d4f8",
+      "input_tokens": 2047,
+      "output_tokens": 446,
+      "cost_usd": 0.00982625,
+      "price_input_per_1m": 1.75,
+      "price_output_per_1m": 14.0,
+      "price_model_key": "gpt-5.2",
+      "price_source": "MODEL_PAGE_PER_1M_TOKENS",
+      "formula": {
+        "template": "cost_usd = (input_tokens/1e6)*price_in + (output_tokens/1e6)*price_out",
+        "substituted": "= (2047/1e6)*1.75 + (446/1e6)*14.0 = 0.003582 + 0.006244 = 0.009826",
+        "input_cost_usd": 0.0035822500000000004,
+        "output_cost_usd": 0.0062439999999999996
+      }
+    },
+    "claims": {
+      "found": true,
+      "step": "claims",
+      "model": "gpt-5.2",
+      "run_id": "b062f698-d58a-49da-873e-3a776a22d4f8",
+      "input_tokens": 4943,
+      "output_tokens": 1360,
+      "cost_usd": 0.02769025,
+      "price_input_per_1m": 1.75,
+      "price_output_per_1m": 14.0,
+      "price_model_key": "gpt-5.2",
+      "price_source": "MODEL_PAGE_PER_1M_TOKENS",
+      "formula": {
+        "template": "cost_usd = (input_tokens/1e6)*price_in + (output_tokens/1e6)*price_out",
+        "substituted": "= (4943/1e6)*1.75 + (1360/1e6)*14.0 = 0.008650 + 0.019040 = 0.027690",
+        "input_cost_usd": 0.00865025,
+        "output_cost_usd": 0.01904
+      }
+    },
+    "spec": {
+      "found": true,
+      "step": "spec",
+      "model": "gpt-5.2",
+      "run_id": "b062f698-d58a-49da-873e-3a776a22d4f8",
+      "input_tokens": 8310,
+      "output_tokens": 7450,
+      "cost_usd": 0.1188425,
+      "price_input_per_1m": 1.75,
+      "price_output_per_1m": 14.0,
+      "price_model_key": "gpt-5.2",
+      "price_source": "MODEL_PAGE_PER_1M_TOKENS",
+      "formula": {
+        "template": "cost_usd = (input_tokens/1e6)*price_in + (output_tokens/1e6)*price_out",
+        "substituted": "= (8310/1e6)*1.75 + (7450/1e6)*14.0 = 0.014542 + 0.104300 = 0.118843",
+        "input_cost_usd": 0.0145425,
+        "output_cost_usd": 0.1043
+      }
+    }
+  },
+  "total": {
+    "cost_usd": 0.156359,
+    "cost_jpy": 24.47,
+    "input_tokens": 15300,
+    "output_tokens": 9256,
+    "cost_usd_breakdown": [
+      {
+        "step": "drawings",
+        "cost_usd": 0.00982625
+      },
+      {
+        "step": "claims",
+        "cost_usd": 0.02769025
+      },
+      {
+        "step": "spec",
+        "cost_usd": 0.1188425
+      }
+    ],
+    "equation_jpy": "cost_jpy = cost_usd * USDJPY = 0.156359 * 156.5 = 24.47"
+  }
+}

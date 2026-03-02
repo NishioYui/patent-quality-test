@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "model": "gpt-5.2",
+    "temperature": 0.2,
+    "prompt_version": "drawings_v0.1",
+    "run_id": "resp_0c8f2de0db5465d00069a4cf7ac29081a1b8874323c6ab0c31",
+    "language": "ja"
+  },
+  "source": {
+    "img_dir": "runs\\images_drawings",
+    "pages": "ALL"
+  },
+  "figures": [
+    {
+      "label": "図1",
+      "description": "概略構成図（ユーザ端末→装置→サーバの通信イメージ）",
+      "confidence": 0.72
+    },
+    {
+      "label": "図3",
+      "description": "処理フロー図（ステップS11〜S14程度が記載）",
+      "confidence": 0.66
+    },
+    {
+      "label": "図2",
+      "description": "端末装置の機能ブロック図（各部の入出力関係）",
+      "confidence": 0.78
+    }
+  ],
+  "reference_signs": [
+    {
+      "sign": "1",
+      "name": "（システム全体／構成の括り）",
+      "confidence": 0.35
+    },
+    {
+      "sign": "10",
+      "name": "端末装置",
+      "confidence": 0.74
+    },
+    {
+      "sign": "11",
+      "name": "マイク",
+      "confidence": 0.62
+    },
+    {
+      "sign": "12",
+      "name": "音声認識部",
+      "confidence": 0.78
+    },
+    {
+      "sign": "13",
+      "name": "通信部",
+      "confidence": 0.7
+    },
+    {
+      "sign": "14",
+      "name": "音声利用制御部",
+      "confidence": 0.55
+    },
+    {
+      "sign": "15",
+      "name": "生成部",
+      "confidence": 0.52
+    },
+    {
+      "sign": "16",
+      "name": "音声合成部",
+      "confidence": 0.76
+    },
+    {
+      "sign": "17",
+      "name": "スピーカ",
+      "confidence": 0.7
+    },
+    {
+      "sign": "30",
+      "name": "サーバ",
+      "confidence": 0.8
+    }
+  ],
+  "warnings": [
+    {
+      "code": "LOW_LEGIBILITY",
+      "message": "手書き図面で一部の文字が判別困難なため、符号14/15の名称は推定を含みます。"
+    },
+    {
+      "code": "UNCERTAIN_REF",
+      "message": "符号「1」は図全体の括りを示しているように見えますが、名称が読み取れないため不確実です。"
+    },
+    {
+      "code": "FLOW_STEPS_UNCLEAR",
+      "message": "図3の各処理内容の文言は判読が難しく、フロー図であることとステップ番号（S11〜S14付近）のみ確度高めです。"
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "model": "gpt-5.2",
+    "temperature": 0.2,
+    "prompt_version": "drawings_v0.1",
+    "run_id": "resp_099ae60cb9f283d10069a4c84803b0819f87fa64a71196ede7",
+    "language": "ja"
+  },
+  "source": {
+    "img_dir": "runs\\images_drawings",
+    "pages": "ALL"
+  },
+  "figures": [
+    {
+      "label": "図1",
+      "description": "端末（ユーザ）→（無線/通信）→装置→サーバの概略構成を示す模式図（システム構成図）",
+      "confidence": 0.72
+    },
+    {
+      "label": "図3",
+      "description": "処理手順を示すフロー図（S11〜S14等のステップが記載）",
+      "confidence": 0.74
+    },
+    {
+      "label": "図2",
+      "description": "端末装置の機能ブロック図（各部12〜17等）",
+      "confidence": 0.78
+    }
+  ],
+  "reference_signs": [
+    {
+      "sign": "10",
+      "name": "端末装置",
+      "confidence": 0.7
+    },
+    {
+      "sign": "11",
+      "name": "マイク",
+      "confidence": 0.62
+    },
+    {
+      "sign": "12",
+      "name": "音声認識部",
+      "confidence": 0.78
+    },
+    {
+      "sign": "13",
+      "name": "通信部",
+      "confidence": 0.8
+    },
+    {
+      "sign": "14",
+      "name": "応答時間予測部",
+      "confidence": 0.62
+    },
+    {
+      "sign": "15",
+      "name": "生成処理部",
+      "confidence": 0.6
+    },
+    {
+      "sign": "16",
+      "name": "音声生成部",
+      "confidence": 0.74
+    },
+    {
+      "sign": "17",
+      "name": "スピーカ",
+      "confidence": 0.7
+    },
+    {
+      "sign": "30",
+      "name": "サーバ",
+      "confidence": 0.76
+    }
+  ],
+  "warnings": [
+    {
+      "code": "LOW_OCR",
+      "message": "手書き図面のため一部文字が判別困難。特に符号14,15の名称は読み取りが不確実です。"
+    },
+    {
+      "code": "PARTIAL_CONTEXT",
+      "message": "図1の中間装置（四角枠）の名称が判読できず、符号も確定できませんでした。"
+    }
+  ]
+}

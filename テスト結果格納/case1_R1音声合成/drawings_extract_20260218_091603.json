@@ -1,0 +1,83 @@
+{
+  "metadata": {
+    "model": "gpt-5.2",
+    "temperature": 0.2,
+    "prompt_version": "drawings_v0.1",
+    "run_id": "resp_0732f2180d1b524300699504b4b3288193938de2409b0d58af",
+    "language": "ja"
+  },
+  "source": {
+    "img_dir": "runs\\images_drawings",
+    "pages": "1"
+  },
+  "figures": [
+    {
+      "label": "図1",
+      "description": "人物が端末（10）を操作し、装置（「変換」らしきブロック）を介してサーバ（30）へ通信する概略構成図",
+      "confidence": 0.62
+    },
+    {
+      "label": "図3",
+      "description": "処理手順のフローチャート（S11〜S14、S15等のステップ番号が付与）",
+      "confidence": 0.7
+    },
+    {
+      "label": "図2",
+      "description": "端末装置（10）の機能ブロック図（通信部13、記憶部11、表示部17等）",
+      "confidence": 0.74
+    }
+  ],
+  "reference_signs": [
+    {
+      "sign": "10",
+      "name": "端末装置",
+      "confidence": 0.78
+    },
+    {
+      "sign": "30",
+      "name": "サーバ",
+      "confidence": 0.7
+    },
+    {
+      "sign": "11",
+      "name": "記憶部",
+      "confidence": 0.62
+    },
+    {
+      "sign": "12",
+      "name": "音声番号受信部（「音声番号受信」まで判読）",
+      "confidence": 0.46
+    },
+    {
+      "sign": "13",
+      "name": "通信部",
+      "confidence": 0.72
+    },
+    {
+      "sign": "14",
+      "name": "音声番号判別部（「音声番号判別」まで判読）",
+      "confidence": 0.5
+    },
+    {
+      "sign": "15",
+      "name": "生成処理部（「生成処理」まで判読）",
+      "confidence": 0.52
+    },
+    {
+      "sign": "16",
+      "name": "音声生成部",
+      "confidence": 0.58
+    },
+    {
+      "sign": "17",
+      "name": "表示部",
+      "confidence": 0.66
+    }
+  ],
+  "warnings": [
+    {
+      "code": "LOW_LEGIBILITY",
+      "message": "手書きで解像度が低く、一部の部品名（特に12,14,15,16付近）が不鮮明なため推定を含みます。"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClaimsOnlyDraft",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["claims", "warnings", "metadata"],
+  "properties": {
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["independent", "dependent"],
+      "properties": {
+        "independent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "text"],
+          "properties": {
+            "id": { "type": "string", "const": "I1" },
+            "text": { "type": "string" }
+          }
+        },
+        "dependent": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 7,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "depends_on", "text"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^D[2-8]$" },
+              "depends_on": { "type": "string", "pattern": "^(I1|D[2-8])$" },
+              "text": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "message", "evidence"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "TERM_INCONSISTENCY",
+              "DEPENDENCY_BROKEN",
+              "SUPPORT_LACKING",
+              "UNIT_OR_RANGE_CONFLICT"
+            ]
+          },
+          "severity": { "type": "string", "enum": ["low", "medium", "high"] },
+          "message": { "type": "string" },
+          "evidence": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["quote", "location"],
+              "properties": {
+                "quote": { "type": "string" },
+                "location": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "temperature", "prompt_version", "run_id", "language"],
+      "properties": {
+        "model": { "type": "string" },
+        "temperature": { "type": "number", "minimum": 0, "maximum": 1 },
+        "prompt_version": { "type": "string" },
+        "run_id": { "type": "string" },
+        "language": { "type": "string", "const": "ja" }
+      }
+    }
+  }
+}

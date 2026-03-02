@@ -1,0 +1,20 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Runs / outputs
+runs/
+*.log
+logs.txt
+
+# OS/editor
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+.env.*
+**/*secret*
+**/*apikey*
+**/*api_key*

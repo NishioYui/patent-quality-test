@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "model": "gpt-5.2",
+    "temperature": 0.2,
+    "prompt_version": "drawings_v0.1",
+    "run_id": "resp_05428786cdede4f7006995404d8bbc81959351d702e8bd52ae",
+    "language": "ja"
+  },
+  "source": {
+    "img_dir": "runs\\images_drawings",
+    "pages": "ALL"
+  },
+  "figures": [
+    {
+      "label": "図1",
+      "description": "ユーザ（端末）→装置→サーバの概略構成（通信/システム概念図）",
+      "confidence": 0.62
+    },
+    {
+      "label": "図3",
+      "description": "処理手順を示すフロー図（S11〜S14程度のステップ）",
+      "confidence": 0.7
+    },
+    {
+      "label": "図2",
+      "description": "端末装置の機能ブロック図（各部の構成）",
+      "confidence": 0.78
+    }
+  ],
+  "reference_signs": [
+    {
+      "sign": "10",
+      "name": "端末装置（全体）",
+      "confidence": 0.72
+    },
+    {
+      "sign": "11",
+      "name": "マイク",
+      "confidence": 0.55
+    },
+    {
+      "sign": "12",
+      "name": "音声認識部",
+      "confidence": 0.8
+    },
+    {
+      "sign": "13",
+      "name": "通信部",
+      "confidence": 0.8
+    },
+    {
+      "sign": "14",
+      "name": "応答時間予測部",
+      "confidence": 0.62
+    },
+    {
+      "sign": "15",
+      "name": "生成部",
+      "confidence": 0.6
+    },
+    {
+      "sign": "16",
+      "name": "音声生成部",
+      "confidence": 0.78
+    },
+    {
+      "sign": "17",
+      "name": "スピーカ",
+      "confidence": 0.6
+    },
+    {
+      "sign": "30",
+      "name": "サーバ",
+      "confidence": 0.75
+    }
+  ],
+  "warnings": [
+    {
+      "code": "LOW_OCR_HANDWRITING",
+      "message": "手書き図面のため一部の文字（特に符号11,15,17付近）が判読しづらく、名称は推定を含みます。"
+    },
+    {
+      "code": "FIGURE_LABELS_HANDWRITTEN",
+      "message": "図番号は手書きの「図1/図2/図3」に見えますが、解像度の都合で誤読の可能性があります。"
+    }
+  ]
+}

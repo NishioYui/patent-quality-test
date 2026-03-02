@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "model": "gpt-5.2",
+    "temperature": 0.2,
+    "prompt_version": "drawings_v0.1",
+    "run_id": "resp_0acec82118b190d20069a4d05b0a088190aecde477a58ec5f6",
+    "language": "ja"
+  },
+  "source": {
+    "img_dir": "runs\\images_drawings",
+    "pages": "ALL"
+  },
+  "figures": [
+    {
+      "label": "図1",
+      "description": "概略構成図（ユーザ端末→装置→サーバの通信イメージ）",
+      "confidence": 0.72
+    },
+    {
+      "label": "図3",
+      "description": "処理フロー図（ステップS11〜S14程度が記載）",
+      "confidence": 0.62
+    },
+    {
+      "label": "図2",
+      "description": "端末装置の機能ブロック図（各部の相互接続）",
+      "confidence": 0.78
+    }
+  ],
+  "reference_signs": [
+    {
+      "sign": "10",
+      "name": "端末装置",
+      "confidence": 0.7
+    },
+    {
+      "sign": "11",
+      "name": "マイク",
+      "confidence": 0.55
+    },
+    {
+      "sign": "12",
+      "name": "音声認識部",
+      "confidence": 0.72
+    },
+    {
+      "sign": "13",
+      "name": "通信部",
+      "confidence": 0.7
+    },
+    {
+      "sign": "14",
+      "name": "応答時間予測部",
+      "confidence": 0.62
+    },
+    {
+      "sign": "15",
+      "name": "生成部",
+      "confidence": 0.55
+    },
+    {
+      "sign": "16",
+      "name": "音声生成部",
+      "confidence": 0.6
+    },
+    {
+      "sign": "17",
+      "name": "スピーカ",
+      "confidence": 0.6
+    },
+    {
+      "sign": "30",
+      "name": "サーバ",
+      "confidence": 0.7
+    }
+  ],
+  "warnings": [
+    {
+      "code": "LOW_OCR_001",
+      "message": "手書き文字のため一部の符号名称（特に11,15,16付近）を判読しきれず、推定を含みます。"
+    },
+    {
+      "code": "FIGURE_STEP_UNCLEAR",
+      "message": "図3のステップ番号はS11〜S14のように見えますが、末尾の数字が不鮮明な箇所があります。"
+    }
+  ]
+}

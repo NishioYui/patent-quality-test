@@ -1,0 +1,10 @@
+{
+  "step": "claims",
+  "model": "gpt-5.2",
+  "temperature": 0.2,
+  "run_id": "b062f698-d58a-49da-873e-3a776a22d4f8",
+  "case_file": "cases\\case_A_normal.txt",
+  "input_tokens": 4943,
+  "output_tokens": 1360,
+  "measured_at": "2026-03-02T09:13:46+0900"
+}

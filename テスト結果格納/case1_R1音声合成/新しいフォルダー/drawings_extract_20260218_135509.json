@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "model": "gpt-5.2",
+    "temperature": 0.2,
+    "prompt_version": "drawings_v0.1",
+    "run_id": "resp_0b5ba5dfa5d18004006995462301748190923a31c2b24b05e4",
+    "language": "ja"
+  },
+  "source": {
+    "img_dir": "runs\\images_drawings",
+    "pages": "ALL"
+  },
+  "figures": [
+    {
+      "label": "図1",
+      "description": "ユーザ（端末）から装置を介してサーバへ通信する概略構成図（模式図）",
+      "confidence": 0.72
+    },
+    {
+      "label": "図3",
+      "description": "処理手順を示すフロー図（S11〜S14等のステップ）",
+      "confidence": 0.6
+    },
+    {
+      "label": "図2",
+      "description": "端末装置の機能ブロック図（各部の相互接続）",
+      "confidence": 0.78
+    }
+  ],
+  "reference_signs": [
+    {
+      "sign": "10",
+      "name": "端末装置",
+      "confidence": 0.7
+    },
+    {
+      "sign": "11",
+      "name": "マイク",
+      "confidence": 0.55
+    },
+    {
+      "sign": "12",
+      "name": "音声認識部",
+      "confidence": 0.78
+    },
+    {
+      "sign": "13",
+      "name": "通信部",
+      "confidence": 0.8
+    },
+    {
+      "sign": "14",
+      "name": "音声利用制御部",
+      "confidence": 0.62
+    },
+    {
+      "sign": "15",
+      "name": "生成部",
+      "confidence": 0.55
+    },
+    {
+      "sign": "16",
+      "name": "音声合成部",
+      "confidence": 0.72
+    },
+    {
+      "sign": "17",
+      "name": "スピーカ",
+      "confidence": 0.6
+    },
+    {
+      "sign": "30",
+      "name": "サーバ",
+      "confidence": 0.8
+    }
+  ],
+  "warnings": [
+    {
+      "code": "LOW_LEGIBILITY",
+      "message": "手書きで解像度が低く、一部の符号名称（特に11,14,15,17）が判読困難なためconfidenceを低めに設定しました。"
+    },
+    {
+      "code": "PARTIAL_CONTEXT",
+      "message": "図1の中間ブロック（端末/装置）の符号や名称が明確に読み取れず、サーバ(30)以外はreference_signsに追加できませんでした。"
+    },
+    {
+      "code": "FLOW_STEPS_UNCLEAR",
+      "message": "図3の各ステップ文言（S11〜S14付近）が判読しきれず、図の種類のみ抽出しました。"
+    }
+  ]
+}

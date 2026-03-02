@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "model": "gpt-5.2",
+    "temperature": 0.2,
+    "prompt_version": "drawings_v0.1",
+    "run_id": "resp_04d7c2cb2bb47ea60069951824aec481a292754365ff78498a",
+    "language": "ja"
+  },
+  "source": {
+    "img_dir": "runs\\images_drawings",
+    "pages": "ALL"
+  },
+  "figures": [
+    {
+      "label": "図1",
+      "description": "人物（ユーザ）と端末（スマホ等）から装置（変換/制御部）を介してサーバへ接続する概略構成図（通信/システム概念図）",
+      "confidence": 0.72
+    },
+    {
+      "label": "図3",
+      "description": "処理手順を示すフロー図（S11〜S14付近のステップ）",
+      "confidence": 0.78
+    },
+    {
+      "label": "図2",
+      "description": "端末装置の機能ブロック図（通信部/記憶部/表示部等）",
+      "confidence": 0.8
+    }
+  ],
+  "reference_signs": [
+    {
+      "sign": "10",
+      "name": "端末装置（枠全体）",
+      "confidence": 0.7
+    },
+    {
+      "sign": "11",
+      "name": "記憶（記憶部）",
+      "confidence": 0.62
+    },
+    {
+      "sign": "12",
+      "name": "音声認識部",
+      "confidence": 0.78
+    },
+    {
+      "sign": "13",
+      "name": "通信部",
+      "confidence": 0.8
+    },
+    {
+      "sign": "14",
+      "name": "音声利用制御部",
+      "confidence": 0.55
+    },
+    {
+      "sign": "15",
+      "name": "生成処理部",
+      "confidence": 0.6
+    },
+    {
+      "sign": "16",
+      "name": "音声生成部",
+      "confidence": 0.66
+    },
+    {
+      "sign": "17",
+      "name": "表示部",
+      "confidence": 0.82
+    },
+    {
+      "sign": "30",
+      "name": "サーバ",
+      "confidence": 0.85
+    }
+  ],
+  "warnings": [
+    {
+      "code": "LOW_LEGIBILITY",
+      "message": "手書き文字の判読が難しい箇所があり、特に符号11/14/15/16付近の名称は推定を含みます。原図の高解像度版があると精度が上がります。"
+    },
+    {
+      "code": "FIGURE_LABEL_STYLE",
+      "message": "図番号は手書きで「図1/図2/図3」と読めるものの、角括弧付き表記のため判読に若干の不確実性があります。"
+    }
+  ]
+}

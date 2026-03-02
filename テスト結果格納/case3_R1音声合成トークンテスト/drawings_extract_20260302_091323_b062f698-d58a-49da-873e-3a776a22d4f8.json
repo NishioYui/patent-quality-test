@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "model": "gpt-5.2",
+    "temperature": 0.2,
+    "prompt_version": "drawings_v0.1",
+    "run_id": "b062f698-d58a-49da-873e-3a776a22d4f8",
+    "language": "ja",
+    "usage_input_tokens": 2047,
+    "usage_output_tokens": 446,
+    "usage_file": "usage_drawings_case_A_normal.txt_b062f698-d58a-49da-873e-3a776a22d4f8.json",
+    "cost_usd": 0.00982625,
+    "cost_file": "cost_drawings_case_A_normal.txt_b062f698-d58a-49da-873e-3a776a22d4f8.json"
+  },
+  "source": {
+    "img_dir": "runs\\images_drawings",
+    "pages": "ALL"
+  },
+  "figures": [
+    {
+      "label": "図1",
+      "description": "概略構成図（ユーザ/端末→装置→サーバの通信イメージ）",
+      "confidence": 0.7
+    },
+    {
+      "label": "図3",
+      "description": "処理フロー図（S11〜S14等のステップを含む）",
+      "confidence": 0.75
+    },
+    {
+      "label": "図2",
+      "description": "端末装置の機能ブロック図（複数の部/手段の構成）",
+      "confidence": 0.8
+    }
+  ],
+  "reference_signs": [
+    {
+      "sign": "10",
+      "name": "端末装置（枠で囲まれた装置）",
+      "confidence": 0.7
+    },
+    {
+      "sign": "11",
+      "name": "マイク",
+      "confidence": 0.55
+    },
+    {
+      "sign": "12",
+      "name": "音声認識部",
+      "confidence": 0.75
+    },
+    {
+      "sign": "13",
+      "name": "通信部",
+      "confidence": 0.75
+    },
+    {
+      "sign": "14",
+      "name": "応答時間予測部",
+      "confidence": 0.55
+    },
+    {
+      "sign": "15",
+      "name": "生成部",
+      "confidence": 0.55
+    },
+    {
+      "sign": "16",
+      "name": "音声合成部",
+      "confidence": 0.65
+    },
+    {
+      "sign": "17",
+      "name": "スピーカ",
+      "confidence": 0.6
+    },
+    {
+      "sign": "30",
+      "name": "サーバ",
+      "confidence": 0.7
+    }
+  ],
+  "warnings": [
+    {
+      "code": "low_legibility",
+      "message": "手書きで解像度が低く、一部の符号（例：11,14,15,17）と名称の判読が不確実です。"
+    },
+    {
+      "code": "partial_ocr",
+      "message": "図3の各処理文言は判読困難な箇所が多く、ステップ番号（S11〜S14等）以外は確実に抽出できません。"
+    },
+    {
+      "code": "ambiguous_component",
+      "message": "図1の中間ブロック（端末/装置名）に付された符号が判別できず、サーバ(30)以外の符号対応は未抽出です。"
+    }
+  ]
+}

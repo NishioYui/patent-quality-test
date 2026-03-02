@@ -1,0 +1,13 @@
+invention_text:
+"""
+{{INVENTION_TEXT}}
+"""
+
+drawings_json:
+{{DRAWINGS_JSON}}
+
+メタ情報:
+- language: ja
+
+【drawings_json（図面解析結果。無ければ空）】
+{{DRAWINGS_JSON}}

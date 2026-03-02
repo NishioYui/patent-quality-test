@@ -1,0 +1,111 @@
+{
+  "metadata": {
+    "model": "gpt-5.2",
+    "temperature": 0.2,
+    "prompt_version": "drawings_v0.1",
+    "run_id": "resp_01e1cb3bf417966c006993a7d626c88194b5c3bc34cd4428e3",
+    "language": "ja"
+  },
+  "source": {
+    "img_dir": "runs\\images_drawings",
+    "pages": "1"
+  },
+  "figures": [
+    {
+      "label": "図1",
+      "description": "概略構成図（人物が端末を操作し、通信を介して装置（制御部/サーバ等）へ接続するイメージ）",
+      "confidence": 0.55
+    },
+    {
+      "label": "図3",
+      "description": "フロー図（処理手順S11〜S14程度のステップが縦に並ぶ）",
+      "confidence": 0.7
+    },
+    {
+      "label": "図2",
+      "description": "ブロック図（装置10の内部構成：音声関連部、通信部、記憶部、表示部など）",
+      "confidence": 0.75
+    }
+  ],
+  "reference_signs": [
+    {
+      "sign": "10",
+      "name": "端末装置（装置本体）",
+      "confidence": 0.55
+    },
+    {
+      "sign": "11",
+      "name": "マイク",
+      "confidence": 0.6
+    },
+    {
+      "sign": "12",
+      "name": "音声認識部",
+      "confidence": 0.7
+    },
+    {
+      "sign": "13",
+      "name": "通信部",
+      "confidence": 0.75
+    },
+    {
+      "sign": "14",
+      "name": "音声制御用制御部",
+      "confidence": 0.45
+    },
+    {
+      "sign": "15",
+      "name": "生成部",
+      "confidence": 0.55
+    },
+    {
+      "sign": "16",
+      "name": "音声生成部",
+      "confidence": 0.6
+    },
+    {
+      "sign": "17",
+      "name": "スピーカ",
+      "confidence": 0.6
+    },
+    {
+      "sign": "30",
+      "name": "サーバ",
+      "confidence": 0.65
+    },
+    {
+      "sign": "S11",
+      "name": "（フロー）ユーザがチャットを開始",
+      "confidence": 0.35
+    },
+    {
+      "sign": "S12",
+      "name": "（フロー）音声コマンドの音声をサーバへ送信",
+      "confidence": 0.35
+    },
+    {
+      "sign": "S13",
+      "name": "（フロー）文字列の生成",
+      "confidence": 0.25
+    },
+    {
+      "sign": "S14",
+      "name": "（フロー）生成結果を音声データに変換して出力",
+      "confidence": 0.25
+    }
+  ],
+  "warnings": [
+    {
+      "code": "LOW_LEGIBILITY",
+      "message": "手書きで解像度が低く、一部の文字（特にフロー図の各ステップ文言、符号14〜16付近）が判読困難です。名称は推定を含みます。"
+    },
+    {
+      "code": "FIGURE_LABEL_UNCERTAIN",
+      "message": "図番号は「図1/図2/図3」と読めますが、手書きのため確度が完全ではありません。"
+    },
+    {
+      "code": "REFERENCE_SIGN_AMBIGUOUS",
+      "message": "符号10は装置枠を指しているように見えますが、端末装置/装置本体のいずれの表記かは画像のみでは確定できません。"
+    }
+  ]
+}

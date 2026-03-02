@@ -1,0 +1,12 @@
+{
+  "step": "spec",
+  "model": "gpt-5.2",
+  "run_id": "efe895ae-f3cd-45e1-adff-38d090da5c26",
+  "input_tokens": 7843,
+  "output_tokens": 6144,
+  "cost_usd": 0.09974125,
+  "price_input_per_1m": 1.75,
+  "price_output_per_1m": 14.0,
+  "price_model_key": "gpt-5.2",
+  "price_source": "MODEL_PAGE_PER_1M_TOKENS"
+}
