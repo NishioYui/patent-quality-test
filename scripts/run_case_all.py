@@ -73,22 +73,32 @@ def main():
     if not case_file:
         raise SystemExit('CASE_FILE が未設定です。例: set "CASE_FILE=cases\\case_A_normal.txt"')
 
-    # ---- 共通化ポイント：PDFは「指定があれば使う」「無ければ既定を探す」「無ければスキップ」 ----
-    pdf_file = base_env.get("PDF_FILE", "").strip()
+    # ---- 共通化ポイント：PDFは「指定があれば使う」「未指定なら既定を探す」「空文字ならスキップ」 ----
+    # 重要：base_env.get("PDF_FILE", None)
+    #   - None: 未指定（CLIで既定PDFを自動採用したいケース）
+    #   - ""  : 明示スキップ（API経由の図面なし）
+    pdf_env = base_env.get("PDF_FILE", None)
+
     default_pdf_rel = r"inputs\drawings.pdf"
     default_pdf_abs = ROOT / default_pdf_rel
 
-    if not pdf_file:
+    if pdf_env is None:
+        # PDF_FILE が“未指定”のときだけ、既定PDFを自動採用（CLI向け）
         if default_pdf_abs.exists():
             pdf_file = default_pdf_rel
             print(f"[INFO] PDF_FILE not set -> using default: {pdf_file}")
         else:
             pdf_file = ""  # drawings step skip
     else:
-        pdf_abs = ROOT / pdf_file
-        if not pdf_abs.exists():
-            print(f"[WARN] PDF_FILE is set but not found -> skip drawings: {pdf_abs}")
-            pdf_file = ""
+        # PDF_FILE が“指定”されている（空文字も含む）
+        pdf_file = str(pdf_env).strip()
+        if not pdf_file:
+            pdf_file = ""  # 明示スキップ（API経由の図面なし）
+        else:
+            pdf_abs = ROOT / pdf_file
+            if not pdf_abs.exists():
+                print(f"[WARN] PDF_FILE is set but not found -> skip drawings: {pdf_abs}")
+                pdf_file = ""
 
     # IMG_DIR の既定は RUN_DIR 配下に寄せる（整理）
     img_dir = base_env.get("IMG_DIR", fr"{run_dir}\images_drawings").strip()
@@ -119,7 +129,7 @@ def main():
     if not drawings_json_path:
         if pdf_file:
             env = base_env.copy()
-            env["CASE_FILE"] = case_file            # ★追加：drawingsのcost命名に必要
+            env["CASE_FILE"] = case_file            # ★drawingsのcost命名に必要
             env["PDF_FILE"] = pdf_file
             env["IMG_DIR"] = img_dir
             env["MODEL"] = model
