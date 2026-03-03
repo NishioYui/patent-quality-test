@@ -2,6 +2,12 @@ import os, json, uuid
 import sys, time
 from openai import OpenAI
 from cost_utils import get_price_info, estimate_cost_usd
+from pathlib import Path
+from dotenv import load_dotenv
+
+ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(dotenv_path=ROOT / ".env")
+
 
 client = OpenAI()
 
