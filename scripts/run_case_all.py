@@ -14,12 +14,31 @@ SCRIPTS = ROOT / "scripts"
 def eprint(*args):
     print(*args, file=sys.stderr)
 
+def _detect_python_bin() -> str:
+    """
+    子プロセスは必ず venv の python を優先して使う。
+    - Windows: .venv\\Scripts\\python.exe
+    - Unix   : .venv/bin/python
+    それが無ければ sys.executable にフォールバック。
+    """
+    if os.name == "nt":
+        cand = ROOT / ".venv" / "Scripts" / "python.exe"
+    else:
+        cand = ROOT / ".venv" / "bin" / "python"
+    if cand.exists():
+        return str(cand)
+    return sys.executable
+
+# 環境変数で上書きも可能（CI等）
+PYTHON_BIN = (os.environ.get("PYTHON_BIN", "").strip() or _detect_python_bin())
+
 def run_script(script_filename: str, env: dict) -> str:
     script_path = SCRIPTS / script_filename
     if not script_path.exists():
         raise FileNotFoundError(f"Script not found: {script_path}")
 
-    cmd = [sys.executable, str(script_path)]
+    # ★ 子スクリプトは必ず venv python で起動
+    cmd = [PYTHON_BIN, str(script_path)]
     proc = subprocess.run(
         cmd,
         env=env,
@@ -68,13 +87,13 @@ def main():
 
     print(f"[INFO] RUN_DIR = {run_dir}")
     print(f"[INFO] RUN_ID  = {run_id}")
+    print(f"[INFO] PYTHON_BIN = {PYTHON_BIN}")
 
     case_file = base_env.get("CASE_FILE", "").strip()
     if not case_file:
         raise SystemExit('CASE_FILE が未設定です。例: set "CASE_FILE=cases\\case_A_normal.txt"')
 
     # ---- 共通化ポイント：PDFは「指定があれば使う」「未指定なら既定を探す」「空文字ならスキップ」 ----
-    # 重要：base_env.get("PDF_FILE", None)
     #   - None: 未指定（CLIで既定PDFを自動採用したいケース）
     #   - ""  : 明示スキップ（API経由の図面なし）
     pdf_env = base_env.get("PDF_FILE", None)
@@ -245,7 +264,7 @@ def main():
         "total": {"cost_usd": 0.0, "cost_jpy": 0.0, "input_tokens": 0, "output_tokens": 0},
     }
 
-    required_steps = {"claims", "spec"}   # ここが無いと “一連” として成立しない
+    required_steps = {"claims", "spec"}
     total_cost_known = True
     step_costs_usd = []
 
@@ -271,7 +290,6 @@ def main():
 
         summary["steps"][step] = {"found": True, **obj}
 
-        # 式の表示（priceが無いと代入が作れない）
         if isinstance(pin, (int, float)) and isinstance(pout, (int, float)):
             summary["steps"][step]["formula"] = _format_formula(it, ot, float(pin), float(pout), cost_usd)
         else:
