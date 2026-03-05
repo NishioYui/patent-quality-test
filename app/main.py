@@ -13,6 +13,12 @@ from app.invention_text import build_invention_text
 from app.storage import job_dir, ensure_dir, atomic_write_json, read_json, list_artifacts
 from app.job_runner import start_job
 from app.severity import attach_severity
+from pathlib import Path
+from dotenv import load_dotenv
+
+# プロジェクトルートの .env を読む（無ければ何もしない）
+ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(dotenv_path=ROOT / ".env")
 
 
 def _now_iso() -> str:
@@ -64,6 +70,7 @@ async def create_job(
         "has_pdf": bool(drawing_pdf),
         "model": os.getenv("MODEL", "gpt-5.2"),
         "temperature": float(os.getenv("TEMPERATURE", "0.2")),
+        "input_template_version": "invention_text_v0.1",
     }
     atomic_write_json(jdir / "request.json", req_obj)
 
