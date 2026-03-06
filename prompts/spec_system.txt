@@ -198,3 +198,9 @@
 - 不足があれば warnings に SUPPORT_LACKING（A/B/C）や DRAWING_* を適切に追加し、message に理由を具体的に書く。
 - JSONはスキーマに厳密準拠。JSONだけを出力する。
 ────────────────────────
+
+
+【図面未提供時のルール】
+DRAWINGS_JSON.figures が空の場合、図面は未提供として扱うこと。
+- drawings（作成予定図）として最低1枚「図１」を必ず設定する（可能なら図２も）
+- warnings に必ず code="DRAWING_ASSUMED" を含めること

@@ -32,11 +32,32 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 def list_artifacts(jdir: Path) -> List[dict]:
+    """
+    UI向けに公開する成果物のみ返す（規約固定）。
+    - 固定名: claims.json / spec.json / logs.txt
+    - 任意: cost_summary_*.json, drawings_extract_*.json, *.docx
+    """
+    allow_names = {"claims.json", "spec.json", "logs.txt"}
+    allow_prefixes = {"drawings_extract_"}
+    allow_suffixes = {".docx"}
+
     out: List[dict] = []
     for p in sorted(jdir.glob("*")):
         if p.is_dir():
             continue
         name = p.name
+
+        ok = False
+        if name in allow_names:
+            ok = True
+        elif any(name.startswith(pref) for pref in allow_prefixes):
+            ok = True
+        elif p.suffix.lower() in allow_suffixes:
+            ok = True
+
+        if not ok:
+            continue
+
         size = p.stat().st_size
         digest = sha256_file(p)
         out.append({

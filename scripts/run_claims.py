@@ -2,6 +2,12 @@ import os, json, uuid
 import sys, time
 from openai import OpenAI
 from cost_utils import get_price_info, estimate_cost_usd
+from pathlib import Path
+from dotenv import load_dotenv
+
+ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(dotenv_path=ROOT / ".env")
+
 
 client = OpenAI()
 
@@ -182,7 +188,7 @@ data = json.loads(resp.output_text)
 data.setdefault("metadata", {})
 data["metadata"]["model"] = MODEL
 data["metadata"]["temperature"] = TEMPERATURE
-data["metadata"]["prompt_version"] = "claims_v0.1"
+data["metadata"]["prompt_version"] = "claims_v0.2"
 data["metadata"]["run_id"] = run_id
 data["metadata"]["language"] = "ja"
 

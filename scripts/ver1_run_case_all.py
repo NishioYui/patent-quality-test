@@ -14,31 +14,12 @@ SCRIPTS = ROOT / "scripts"
 def eprint(*args):
     print(*args, file=sys.stderr)
 
-def _detect_python_bin() -> str:
-    """
-    子プロセスは必ず venv の python を優先して使う。
-    - Windows: .venv\\Scripts\\python.exe
-    - Unix   : .venv/bin/python
-    それが無ければ sys.executable にフォールバック。
-    """
-    if os.name == "nt":
-        cand = ROOT / ".venv" / "Scripts" / "python.exe"
-    else:
-        cand = ROOT / ".venv" / "bin" / "python"
-    if cand.exists():
-        return str(cand)
-    return sys.executable
-
-# 環境変数で上書きも可能（CI等）
-PYTHON_BIN = (os.environ.get("PYTHON_BIN", "").strip() or _detect_python_bin())
-
 def run_script(script_filename: str, env: dict) -> str:
     script_path = SCRIPTS / script_filename
     if not script_path.exists():
         raise FileNotFoundError(f"Script not found: {script_path}")
 
-    # ★ 子スクリプトは必ず venv python で起動
-    cmd = [PYTHON_BIN, str(script_path)]
+    cmd = [sys.executable, str(script_path)]
     proc = subprocess.run(
         cmd,
         env=env,
@@ -87,37 +68,27 @@ def main():
 
     print(f"[INFO] RUN_DIR = {run_dir}")
     print(f"[INFO] RUN_ID  = {run_id}")
-    print(f"[INFO] PYTHON_BIN = {PYTHON_BIN}")
 
     case_file = base_env.get("CASE_FILE", "").strip()
     if not case_file:
         raise SystemExit('CASE_FILE が未設定です。例: set "CASE_FILE=cases\\case_A_normal.txt"')
 
-    # ---- 共通化ポイント：PDFは「指定があれば使う」「未指定なら既定を探す」「空文字ならスキップ」 ----
-    #   - None: 未指定（CLIで既定PDFを自動採用したいケース）
-    #   - ""  : 明示スキップ（API経由の図面なし）
-    pdf_env = base_env.get("PDF_FILE", None)
-
+    # ---- 共通化ポイント：PDFは「指定があれば使う」「無ければ既定を探す」「無ければスキップ」 ----
+    pdf_file = base_env.get("PDF_FILE", "").strip()
     default_pdf_rel = r"inputs\drawings.pdf"
     default_pdf_abs = ROOT / default_pdf_rel
 
-    if pdf_env is None:
-        # PDF_FILE が“未指定”のときだけ、既定PDFを自動採用（CLI向け）
+    if not pdf_file:
         if default_pdf_abs.exists():
             pdf_file = default_pdf_rel
             print(f"[INFO] PDF_FILE not set -> using default: {pdf_file}")
         else:
             pdf_file = ""  # drawings step skip
     else:
-        # PDF_FILE が“指定”されている（空文字も含む）
-        pdf_file = str(pdf_env).strip()
-        if not pdf_file:
-            pdf_file = ""  # 明示スキップ（API経由の図面なし）
-        else:
-            pdf_abs = ROOT / pdf_file
-            if not pdf_abs.exists():
-                print(f"[WARN] PDF_FILE is set but not found -> skip drawings: {pdf_abs}")
-                pdf_file = ""
+        pdf_abs = ROOT / pdf_file
+        if not pdf_abs.exists():
+            print(f"[WARN] PDF_FILE is set but not found -> skip drawings: {pdf_abs}")
+            pdf_file = ""
 
     # IMG_DIR の既定は RUN_DIR 配下に寄せる（整理）
     img_dir = base_env.get("IMG_DIR", fr"{run_dir}\images_drawings").strip()
@@ -148,7 +119,7 @@ def main():
     if not drawings_json_path:
         if pdf_file:
             env = base_env.copy()
-            env["CASE_FILE"] = case_file            # ★drawingsのcost命名に必要
+            env["CASE_FILE"] = case_file            # ★追加：drawingsのcost命名に必要
             env["PDF_FILE"] = pdf_file
             env["IMG_DIR"] = img_dir
             env["MODEL"] = model
@@ -264,7 +235,7 @@ def main():
         "total": {"cost_usd": 0.0, "cost_jpy": 0.0, "input_tokens": 0, "output_tokens": 0},
     }
 
-    required_steps = {"claims", "spec"}
+    required_steps = {"claims", "spec"}   # ここが無いと “一連” として成立しない
     total_cost_known = True
     step_costs_usd = []
 
@@ -290,6 +261,7 @@ def main():
 
         summary["steps"][step] = {"found": True, **obj}
 
+        # 式の表示（priceが無いと代入が作れない）
         if isinstance(pin, (int, float)) and isinstance(pout, (int, float)):
             summary["steps"][step]["formula"] = _format_formula(it, ot, float(pin), float(pout), cost_usd)
         else:

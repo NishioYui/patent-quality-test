@@ -2,6 +2,12 @@ import os, glob, json, base64, sys, time, uuid
 from datetime import datetime
 from openai import OpenAI
 from cost_utils import get_price_info, estimate_cost_usd
+from pathlib import Path
+from dotenv import load_dotenv
+
+ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(dotenv_path=ROOT / ".env")
+
 
 MODEL = os.getenv("MODEL", "gpt-5.2")
 TEMPERATURE = float(os.getenv("TEMPERATURE", "0.2"))
