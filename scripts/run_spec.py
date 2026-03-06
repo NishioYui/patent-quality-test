@@ -200,11 +200,38 @@ with open(cost_path, "w", encoding="utf-8") as f:
 # --- Parse output JSON ---
 data = json.loads(resp.output_text)
 
+# ===== Enforce DRAWING_ASSUMED when drawings are not provided =====
+def _is_drawings_empty(drawings_json_str: str) -> bool:
+    try:
+        dj = json.loads(drawings_json_str) if drawings_json_str else {}
+        figs = dj.get("figures", [])
+        return not isinstance(figs, list) or len(figs) == 0
+    except Exception:
+        return True
+
+def _has_warning_code(ws: list, code: str) -> bool:
+    for w in ws or []:
+        if isinstance(w, dict) and w.get("code") == code:
+            return True
+    return False
+
+# 「図面未提供」の判定（空JSONを投入している時）
+drawings_were_assumed = (not drawings_path) or _is_drawings_empty(drawings_json)
+
+data.setdefault("warnings", [])
+if drawings_were_assumed and not _has_warning_code(data["warnings"], "DRAWING_ASSUMED"):
+    data["warnings"].append({
+        "code": "DRAWING_ASSUMED",
+        "message": "図面PDFが未提供のため、作成予定図（少なくとも図１）として記載しました。図面が用意できたら再生成してください。"
+    })
+# ================================================================
+
+
 # --- Metadata ---
 data.setdefault("metadata", {})
 data["metadata"]["model"] = MODEL
 data["metadata"]["temperature"] = TEMPERATURE
-data["metadata"]["prompt_version"] = "spec_v0.1"
+data["metadata"]["prompt_version"] = "spec_v0.2"
 data["metadata"]["run_id"] = run_id
 data["metadata"]["language"] = "ja"
 

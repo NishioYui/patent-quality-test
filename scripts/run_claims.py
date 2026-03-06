@@ -188,7 +188,7 @@ data = json.loads(resp.output_text)
 data.setdefault("metadata", {})
 data["metadata"]["model"] = MODEL
 data["metadata"]["temperature"] = TEMPERATURE
-data["metadata"]["prompt_version"] = "claims_v0.1"
+data["metadata"]["prompt_version"] = "claims_v0.2"
 data["metadata"]["run_id"] = run_id
 data["metadata"]["language"] = "ja"
 

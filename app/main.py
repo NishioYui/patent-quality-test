@@ -62,18 +62,6 @@ async def create_job(
     jdir = job_dir(job_id)
     ensure_dir(jdir)
 
-    # 保存：request.json（監査/再現性）
-    req_obj = {
-        "job_id": job_id,
-        "created_at": _now_iso(),
-        "payload": payload,
-        "has_pdf": bool(drawing_pdf),
-        "model": os.getenv("MODEL", "gpt-5.2"),
-        "temperature": float(os.getenv("TEMPERATURE", "0.2")),
-        "input_template_version": "invention_text_v0.1",
-    }
-    atomic_write_json(jdir / "request.json", req_obj)
-
     # input.txt 作成（従来互換のCASE_FILE）
     invention_text = build_invention_text(payload)
     (jdir / "input.txt").write_text(invention_text, encoding="utf-8")
@@ -81,6 +69,21 @@ async def create_job(
     # input_hash
     h = hashlib.sha256(invention_text.encode("utf-8")).hexdigest()
     atomic_write_json(jdir / "input_meta.json", {"sha256": h})
+
+    # 保存：request.json（監査/再現性）※1回で書く
+    req_obj = {
+        "job_id": job_id,
+        "created_at": _now_iso(),
+        "payload": payload,
+        "has_pdf": bool(drawing_pdf),
+        "model": os.getenv("MODEL", "gpt-5.2"),
+        "temperature": float(os.getenv("TEMPERATURE", "0.2")),
+        "run_id": job_id,
+        "run_dir": f"runs/{job_id}",
+        "input_template_version": "invention_text_v0.1",
+        "input_sha256": h,
+    }
+    atomic_write_json(jdir / "request.json", req_obj)
 
     # PDF保存（任意）
     if drawing_pdf is not None:
@@ -101,6 +104,8 @@ async def create_job(
         "is_blocked": False,
         "artifacts": [],
         "error": None,
+        "run_id": job_id,
+        "input_sha256": h,
     })
 
     # 実行env（run_case_allへ）
