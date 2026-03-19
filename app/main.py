@@ -4,13 +4,22 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import json
-import uuid
 import os
 import hashlib
 import time
+import re
+from datetime import datetime
 
 from app.invention_text import build_invention_text
-from app.storage import job_dir, ensure_dir, atomic_write_json, read_json, list_artifacts
+from app.storage import (
+    job_dir,
+    ensure_dir,
+    atomic_write_json,
+    read_json,
+    list_artifacts,
+    is_user_downloadable,
+    RUNS_ROOT,
+)
 from app.job_runner import start_job
 from app.severity import attach_severity
 from pathlib import Path
@@ -20,9 +29,56 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(dotenv_path=ROOT / ".env")
 
+_SAFE_FILENAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
 
 def _now_iso() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S%z")
+
+
+def _now_compact() -> str:
+    return datetime.now().strftime("%Y%m%d%H%M%S")
+
+
+def _sanitize_seq_id(seq_id: str) -> str:
+    """
+    job_id は runs/<job_id>/ のディレクトリ名やURLにも使うので、
+    英数字・アンダースコア・ハイフン以外は除去する。
+    表示を安定させるため大文字化する。
+    """
+    s = (seq_id or "").strip().upper()
+    s = re.sub(r"[^A-Z0-9_-]", "", s)
+    if not s:
+        raise HTTPException(status_code=400, detail="seq_id is required")
+    return s
+
+
+def _reserve_job(seq_id: str) -> tuple[str, Path]:
+    """
+    job_id 形式:
+      SEQIDYYYYMMDDHHMMSS
+    衝突時:
+      SEQIDYYYYMMDDHHMMSS02
+      SEQIDYYYYMMDDHHMMSS03
+      ...
+    先にディレクトリを atomic に確保して、同時実行時の衝突も避ける。
+    """
+    ensure_dir(RUNS_ROOT)
+
+    sid = _sanitize_seq_id(seq_id)
+    base = f"{sid}{_now_compact()}"
+
+    candidates = [base] + [f"{base}{i:02d}" for i in range(2, 100)]
+
+    for candidate in candidates:
+        jdir = job_dir(candidate)
+        try:
+            jdir.mkdir(parents=False, exist_ok=False)
+            return candidate, jdir
+        except FileExistsError:
+            continue
+
+    raise HTTPException(status_code=500, detail="failed to generate unique job_id")
 
 
 app = FastAPI(title="PatentDraft API", version="0.1")
@@ -58,9 +114,9 @@ async def create_job(
     except Exception as ex:
         raise HTTPException(status_code=400, detail=f"Invalid form_json: {repr(ex)}")
 
-    job_id = uuid.uuid4().hex
-    jdir = job_dir(job_id)
-    ensure_dir(jdir)
+    # seq_id 必須（トップレベル想定）
+    seq_id = payload.get("seq_id")
+    job_id, jdir = _reserve_job(str(seq_id or ""))
 
     # input.txt 作成（従来互換のCASE_FILE）
     invention_text = build_invention_text(payload)
@@ -70,7 +126,7 @@ async def create_job(
     h = hashlib.sha256(invention_text.encode("utf-8")).hexdigest()
     atomic_write_json(jdir / "input_meta.json", {"sha256": h})
 
-    # 保存：request.json（監査/再現性）※1回で書く
+    # 保存：request.json（監査/再現性）
     req_obj = {
         "job_id": job_id,
         "created_at": _now_iso(),
@@ -94,22 +150,24 @@ async def create_job(
         pdf_path.write_bytes(content)
 
     # status.json 初期
-    atomic_write_json(jdir / "status.json", {
-        "job_id": job_id,
-        "status": "queued",
-        "created_at": _now_iso(),
-        "started_at": None,
-        "finished_at": None,
-        "warnings": [],
-        "is_blocked": False,
-        "artifacts": [],
-        "error": None,
-        "run_id": job_id,
-        "input_sha256": h,
-    })
+    atomic_write_json(
+        jdir / "status.json",
+        {
+            "job_id": job_id,
+            "status": "queued",
+            "created_at": _now_iso(),
+            "started_at": None,
+            "finished_at": None,
+            "warnings": [],
+            "is_blocked": False,
+            "artifacts": [],
+            "error": None,
+            "run_id": job_id,
+            "input_sha256": h,
+        },
+    )
 
     # 実行env（run_case_allへ）
-    # RUN_DIR を job_dir にする（出力がこのジョブ配下に集約される）
     run_dir_rel = f"runs/{job_id}"
     env = os.environ.copy()
     env["OPEN_NOTEPAD"] = "0"
@@ -120,12 +178,11 @@ async def create_job(
     env["CASE_FILE"] = run_dir_rel + "/input.txt"
 
     # 図面PDFがある場合だけPDF_FILEを指定。無ければ明示的に空文字。
-    pdf_rel = run_dir_rel + "/drawings.pdf"
     if (jdir / "drawings.pdf").exists():
-        env["PDF_FILE"] = pdf_rel
+        env["PDF_FILE"] = run_dir_rel + "/drawings.pdf"
         env["IMG_DIR"] = run_dir_rel + "/images_drawings"
     else:
-        env["PDF_FILE"] = ""  # 明示スキップ（run_case_all側で未指定扱いにしないこと）
+        env["PDF_FILE"] = ""  # 明示スキップ
 
     # start
     start_job(job_id, env)
@@ -143,7 +200,7 @@ def get_job(job_id: str):
     1) runs/<id>/status.json を読み取り
     2) (保険) artifacts が空なら runs/<id>/ 配下から生成
     3) (保険) warnings が空なら claims/spec から抽出し severity 付与
-    4) UIがそのまま描画できるJSONを返す
+    4) logs.txt はユーザーに見せない（artifactsから除外）
     """
     jdir = job_dir(job_id)
     st_path = jdir / "status.json"
@@ -157,7 +214,16 @@ def get_job(job_id: str):
         try:
             st["artifacts"] = list_artifacts(jdir)
         except Exception:
-            pass
+            st["artifacts"] = []
+
+    # 既存status.jsonに非公開ファイルが残っていても、必ず除外
+    try:
+        st["artifacts"] = [
+            a for a in (st.get("artifacts") or [])
+            if isinstance(a, dict) and is_user_downloadable(str(a.get("name", "")))
+        ]
+    except Exception:
+        pass
 
     # ---- 保険2：warnings が空なら claims/spec から抽出してseverity付け ----
     if not st.get("warnings"):
@@ -188,9 +254,13 @@ def download(job_id: str, filename: str):
     if not jdir.exists():
         raise HTTPException(status_code=404, detail="job not found")
 
-    # path traversal防止：ルート直下のファイルだけ許可
-    if "/" in filename or "\\" in filename or filename.startswith("."):
+    # path traversal防止：ルート直下ファイルのみ＆安全な文字だけ
+    if (not _SAFE_FILENAME_RE.fullmatch(filename)) or ("/" in filename) or ("\\" in filename) or filename.startswith("."):
         raise HTTPException(status_code=400, detail="invalid filename")
+
+    # ユーザーに見せて良い成果物だけ許可
+    if not is_user_downloadable(filename):
+        raise HTTPException(status_code=404, detail="file not found")
 
     fpath = jdir / filename
     if not fpath.exists() or not fpath.is_file():

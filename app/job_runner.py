@@ -136,17 +136,119 @@ def _classify_error(tail: str) -> tuple[str, str]:
     UIに出す文言は固定。ここは運用向けの分類だけ行う。
     """
     t = (tail or "")
-    if "insufficient_quota" in t:
-        return "INSUFFICIENT_QUOTA", "OpenAI quota不足（insufficient_quota）"
-    if "api_key must be set" in t or "OPENAI_API_KEY" in t:
+    tl = t.lower()
+
+    # ---- subprocess / local runtime ----
+    if "no such file or directory" in tl and "run_case_all.py" in tl:
+        return "SUBPROCESS_START_FAILED", "run_case_all.py の起動失敗"
+
+    if "no such file or directory" in tl or "filenotfounderror" in tl or "[errno 2]" in tl:
+        return "FILE_NOT_FOUND", "必要ファイルが見つからない"
+
+    if "permissionerror" in tl or "[errno 13]" in tl or "access is denied" in tl:
+        return "PERMISSION_DENIED", "ファイル/ディレクトリアクセス拒否"
+
+    # ---- OpenAI auth / quota / rate ----
+    if "api_key must be set" in tl or "openai_api_key" in tl:
         return "API_KEY_NOT_SET", "APIキー未設定/読み込み失敗"
-    if "RateLimitError" in t or "Error code: 429" in t:
+
+    if "error code: 401" in tl or "authenticationerror" in tl or "invalid api key" in tl:
+        return "AUTH_FAILED", "OpenAI認証失敗（401 / invalid api key）"
+
+    if "error code: 403" in tl or ("permission denied" in tl and "openai" in tl):
+        return "AUTH_FAILED", "OpenAI権限不足（403）"
+
+    if "insufficient_quota" in tl:
+        return "INSUFFICIENT_QUOTA", "OpenAI quota不足（insufficient_quota）"
+
+    if "ratelimiterror" in tl or "error code: 429" in tl:
         return "RATE_LIMIT", "OpenAI 429 RateLimit"
-    if "ModuleNotFoundError" in t:
+
+    # ---- OpenAI request / server ----
+    if "error code: 400" in tl or "badrequesterror" in tl:
+        return "OPENAI_BAD_REQUEST", "OpenAI 400 Bad Request"
+
+    if (
+        "internalservererror" in tl
+        or "error code: 500" in tl
+        or "error code: 502" in tl
+        or "error code: 503" in tl
+        or "error code: 504" in tl
+    ):
+        return "OPENAI_SERVER_ERROR", "OpenAIサーバ側エラー（5xx）"
+
+    # ---- network / timeout ----
+    if (
+        "apiconnectionerror" in tl
+        or "connectionerror" in tl
+        or "connecttimeout" in tl
+        or "readtimeout" in tl
+        or "sslerror" in tl
+    ):
+        return "NETWORK_ERROR", "外部API接続失敗（ネットワーク/SSL）"
+
+    if (
+        "apitimeouterror" in tl
+        or "timeouterror" in tl
+        or "timed out" in tl
+        or "timeout expired" in tl
+    ):
+        return "TIMEOUT", "タイムアウト"
+
+    # ---- dependency ----
+    if "modulenotfounderror" in tl and ("fitz" in tl or "pymupdf" in tl):
+        return "DRAWING_DEPENDENCY_MISSING", "図面解析依存不足（PyMuPDF/fitz）"
+
+    if "modulenotfounderror" in tl:
         return "DEPENDENCY_MISSING", "依存ライブラリ不足（ModuleNotFoundError）"
-    if "fitz" in t or "PyMuPDF" in t:
+
+    # ---- drawing / pdf ----
+    if "fitz" in tl or "pymupdf" in tl:
         return "DRAWING_PARSE_FAILED", "図面解析失敗（PyMuPDF/fitz）"
+
+    if "pdf" in tl and (
+        "cannot open" in tl
+        or "invalid pdf" in tl
+        or "pdfdataerror" in tl
+        or "is empty" in tl
+        or "broken" in tl
+        or "corrupt" in tl
+    ):
+        return "PDF_INVALID", "PDF不正/破損/読込失敗"
+
+    # ---- JSON / schema ----
+    if (
+        "json_schema" in tl
+        or "schema validation" in tl
+        or "does not conform to schema" in tl
+        or ("validationerror" in tl and "schema" in tl)
+    ):
+        return "JSON_SCHEMA_INVALID", "JSON schema不一致"
+
+    if (
+        "jsondecodeerror" in tl
+        or "expecting value" in tl
+        or "extra data" in tl
+        or "expecting ',' delimiter" in tl
+    ):
+        return "OUTPUT_JSON_INVALID", "JSONパース失敗"
+
     return "UNKNOWN", "未知の失敗（logs.txt参照）"
+
+
+def _detect_failed_step(tail: str) -> str | None:
+    tl = (tail or "").lower()
+
+    # run_case_all の例外メッセージで判定
+    if "run_drawings.py failed" in tl:
+        return "drawings"
+    if "render_pdf_pages.py failed" in tl:
+        return "drawings"
+    if "run_claims.py failed" in tl:
+        return "claims"
+    if "run_spec.py failed" in tl:
+        return "spec"
+    return None
 
 
 # ---------- prompt fingerprint & mismatch (status.json only, no new output files) ----------
@@ -331,12 +433,12 @@ def _run_job(job_id: str, env: Dict[str, str]) -> None:
             "error": None,
             "error_code": None,
             "error_detail": None,
+            "failed_step": None,
         },
     )
 
     # 2) logs.txt を必ず作る（固定名保証）
     logs_path.write_text(f"START job_id={job_id} at {_now_iso()}\n", encoding="utf-8")
-
 
     try:
         # 親プロセスも venv python を優先（混在事故を減らす）
@@ -372,9 +474,10 @@ def _run_job(job_id: str, env: Dict[str, str]) -> None:
         if rc != 0:
             tail = _read_tail_text(logs_path)
             code, detail = _classify_error(tail)
+            failed_step = _detect_failed_step(tail)
 
             # UI向け文言は固定（詳細は出さない）
-            user_msg = "生成に失敗しました。時間をおいてもう一度お試しください。"
+            user_msg = f"生成に失敗しました。時間をおいてもう一度お試しください。\n解決しない場合は受付IDを添えて下のボタンからご連絡ください。\n受付ID: {job_id}"
 
             _canonicalize_outputs(jdir)
 
@@ -391,6 +494,7 @@ def _run_job(job_id: str, env: Dict[str, str]) -> None:
                     "error": user_msg,
                     "error_code": code,
                     "error_detail": detail,
+                    "failed_step": failed_step,
                     "prompt_fingerprints": cur_fps,
                     **runtime_meta,
                     **ops,
@@ -418,6 +522,7 @@ def _run_job(job_id: str, env: Dict[str, str]) -> None:
                     "error": None,
                     "error_code": None,
                     "error_detail": None,
+                    "failed_step": None,
                     "prompt_fingerprints": cur_fps,
                     **runtime_meta,
                     **ops,
@@ -435,6 +540,10 @@ def _run_job(job_id: str, env: Dict[str, str]) -> None:
             errors="replace",
         )
 
+        tail = _read_tail_text(logs_path)
+        code, detail = _classify_error(tail)
+        failed_step = _detect_failed_step(tail)
+
         # 例外時も、運用しやすい最小の情報は残す
         runtime_meta = _build_runtime_meta(jdir, env)
         cur_fps = _compute_prompt_fingerprints()
@@ -445,9 +554,10 @@ def _run_job(job_id: str, env: Dict[str, str]) -> None:
             {
                 "status": "failed",
                 "finished_at": _now_iso(),
-                "error": "生成に失敗しました。時間をおいてもう一度お試しください。",
-                "error_code": "EXCEPTION",
-                "error_detail": repr(ex),
+                "error": f"生成に失敗しました。時間をおいてもう一度お試しください。\n解決しない場合は受付IDを添えて下のボタンからご連絡ください。\n受付ID: {job_id}",
+                "error_code": code,
+                "error_detail": f"{detail} / raw={repr(ex)}",
+                "failed_step": failed_step,
                 "prompt_fingerprints": cur_fps,
                 **runtime_meta,
                 **ops,
