@@ -231,7 +231,7 @@ if drawings_were_assumed and not _has_warning_code(data["warnings"], "DRAWING_AS
 data.setdefault("metadata", {})
 data["metadata"]["model"] = MODEL
 data["metadata"]["temperature"] = TEMPERATURE
-data["metadata"]["prompt_version"] = "spec_v0.2"
+data["metadata"]["prompt_version"] = "spec_v0.3"
 data["metadata"]["run_id"] = run_id
 data["metadata"]["language"] = "ja"
 

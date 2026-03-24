@@ -22,6 +22,7 @@ from app.storage import (
     RUNS_ROOT,
 )
 from app.severity import attach_severity
+from app.docx_export import build_patent_docx
 
 
 def _now_iso() -> str:
@@ -503,6 +504,16 @@ def _run_job(job_id: str, env: Dict[str, str]) -> None:
 
         else:
             _canonicalize_outputs(jdir)
+
+            # DOCX生成（非fatal：失敗してもJSON成果物は返す）
+            try:
+                build_patent_docx(jdir, include_warnings=True)
+            except Exception as ex:
+                with open(logs_path, "a", encoding="utf-8", errors="replace") as lf:
+                    lf.write("\n===== DOCX EXPORT FAILED =====\n")
+                    lf.write(repr(ex) + "\n")
+                    lf.write(traceback.format_exc() + "\n")
+                    lf.flush()
 
             warnings, blocked = _build_warnings_and_block(jdir)
             artifacts = list_artifacts(jdir)
